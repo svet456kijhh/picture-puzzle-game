@@ -47,6 +47,8 @@
     .win-card .trophy { font-size: 4.2rem; }
     .win-card h2 { margin: 5px 0 8px; color: #e45d32; font-size: 2.3rem; }
     .win-card p { margin: 8px 0 20px; font-size: 1.1rem; }
+    .win-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+    .win-actions a { text-decoration: none; }
     .result-summary { margin: 15px 0 20px; padding: 14px 18px; border: 2px solid #ffdd70; border-radius: 15px; background: #fff8c9; text-align: left; }
     .result-row { display: flex; justify-content: space-between; gap: 16px; margin: 6px 0; }
     .result-total { margin-top: 10px; padding-top: 10px; border-top: 2px dashed #e3ba3f; color: #e45d32; font-size: 1.3rem; font-weight: bold; }
@@ -105,7 +107,7 @@
       <div class="side"><h2>Помоги картинке ожить!</h2><p class="steps"><b>1</b> Выбери деталь <span>→</span> <b>2</b> Выбери вторую</p><div class="tip">💡 <strong>Подсказка:</strong> <span id="tip">Собери радугу, домик и зелёные деревья в одну большую картину.</span></div><div class="buttons"><button class="control" id="shuffle" type="button">🔀 Перемешать</button><button class="control" id="show" type="button">👀 Подсмотреть</button><label class="control upload-label" for="image-file">📷 Своя картинка</label><input class="upload-input" id="image-file" type="file" accept="image/png,image/jpeg,image/webp"><button class="control secondary" id="open-editor" type="button">⚙ Редактор игры</button></div><div class="difficulty"><label for="artwork">Картина:</label><select id="artwork"></select><br><br><label for="level">Сложность:</label><select id="level"></select></div></div>
     </section>
   </main>
-  <div class="win" id="win" role="dialog" aria-modal="true" aria-labelledby="win-title"><div class="win-card"><div class="celebration" aria-hidden="true"><div class="confetti"></div><span class="firework one"></span><span class="firework two"></span><span class="dancer">🕺</span></div><h2 id="win-title">Поздравляем!</h2><p>Ты собрал картину! Вот это успех!</p><div class="result-summary"><div class="result-row"><span>Ходы:</span><strong id="win-moves">0</strong></div><div class="result-row"><span>За пазл:</span><strong id="puzzle-points">0</strong></div><div class="result-row"><span>Бонус за ходы:</span><strong id="move-points">0</strong></div><div class="result-row" id="quiz-result-row"><span>За тест:</span><strong id="quiz-points">0</strong></div><div class="result-row result-total"><span>Всего баллов:</span><strong id="total-points">0</strong></div></div><button class="control" id="again" type="button">🎨 Собрать ещё раз</button></div></div>
+  <div class="win" id="win" role="dialog" aria-modal="true" aria-labelledby="win-title"><div class="win-card"><div class="celebration" aria-hidden="true"><div class="confetti"></div><span class="firework one"></span><span class="firework two"></span><span class="dancer">🕺</span></div><h2 id="win-title">Поздравляем!</h2><p>Ты собрал картину! Вот это успех!</p><div class="result-summary"><div class="result-row"><span>Ходы:</span><strong id="win-moves">0</strong></div><div class="result-row"><span>За пазл:</span><strong id="puzzle-points">0</strong></div><div class="result-row"><span>Бонус за ходы:</span><strong id="move-points">0</strong></div><div class="result-row" id="quiz-result-row"><span>За тест:</span><strong id="quiz-points">0</strong></div><div class="result-row result-total"><span>Всего баллов:</span><strong id="total-points">0</strong></div></div><div class="win-actions"><button class="control secondary" id="close-win" type="button">Закрыть</button><button class="control" id="again" type="button">🎨 Играть ещё</button><a class="control" href="index.html">🏠 Главное меню</a></div></div></div>
   <div class="win" id="quiz" role="dialog" aria-modal="true" aria-labelledby="quiz-title"><div class="win-card"><div class="trophy">🧠</div><h2 id="quiz-title">Мини-тест</h2><p id="quiz-progress">Вопрос 1 из 3</p><div class="quiz-question" id="quiz-question"></div><div class="quiz-options" id="quiz-options"></div><p class="quiz-feedback" id="quiz-feedback" aria-live="polite"></p></div></div>
   <!-- Доступный встроенный редактор -->
   <div class="editor-overlay" id="editor-overlay" role="dialog" aria-modal="true" aria-labelledby="editor-title">
@@ -351,6 +353,8 @@
 
     // События интерфейса.
     document.getElementById('shuffle').addEventListener('click', start); document.getElementById('again').addEventListener('click', start);
+    document.getElementById('close-win').addEventListener('click', () => win.classList.remove('show'));
+    win.addEventListener('click', event => { if (event.target === win) win.classList.remove('show'); });
     level.addEventListener('change', start); artwork.addEventListener('change', start);
     imageFile.addEventListener('change', () => loadCustomFile(imageFile.files[0], false));
     document.getElementById('editor-image-file').addEventListener('change', event => loadCustomFile(event.target.files[0], true));
@@ -360,7 +364,7 @@
     document.getElementById('editor-form').addEventListener('submit', event => { event.preventDefault(); if (readEditor()) saveSettings(); });
     document.getElementById('editor-reset').addEventListener('click', () => { settings = cloneDefaults(); try { localStorage.removeItem(STORAGE_KEY); } catch (error) { console.warn('Хранилище недоступно:', error); } refreshControls('forest', '3'); start(); fillEditor(); editorMessage.textContent = 'Исходные настройки восстановлены.'; });
     editorOverlay.addEventListener('click', event => { if (event.target === editorOverlay) closeEditor(); });
-    document.addEventListener('keydown', event => { if (event.key === 'Escape' && editorOverlay.classList.contains('show')) closeEditor(); });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') { if (editorOverlay.classList.contains('show')) closeEditor(); else win.classList.remove('show'); } });
 
     refreshControls('forest', '3'); start();
   </script>
