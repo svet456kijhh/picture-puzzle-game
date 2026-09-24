@@ -215,6 +215,9 @@
         if (typeof saved.customImage === 'string') result.customImage = saved.customImage;
         Object.keys(result.pictures).forEach(id => {
           if (saved.pictures && saved.pictures[id]) Object.assign(result.pictures[id], saved.pictures[id]);
+          if (!Array.isArray(result.pictures[id].questions) || !result.pictures[id].questions.length) {
+            result.pictures[id].questions = JSON.parse(JSON.stringify(quizQuestions[id]));
+          }
         });
       } catch (error) { console.warn('Настройки не загружены:', error); }
       if (!Object.values(result.levels).some(Boolean)) result.levels[3] = true;
@@ -290,7 +293,9 @@
       document.getElementById('total-points').textContent = puzzlePoints + movePoints + quizPoints;
     }
     function showQuizQuestion() {
-      const questions = pictureData().questions; const current = questions[quizIndex];
+      const questions = pictureData().questions;
+      if (!Array.isArray(questions) || !questions.length) { showResults(); win.classList.add('show'); return; }
+      const current = questions[quizIndex];
       quizProgress.textContent = `Вопрос ${quizIndex + 1} из ${questions.length}`; quizQuestion.textContent = current.question; quizFeedback.textContent = ''; quizOptions.innerHTML = '';
       current.options.forEach((option, index) => { const button = document.createElement('button'); button.className = 'quiz-option'; button.type = 'button'; button.textContent = option; button.addEventListener('click', () => answerQuiz(index, current.answer, questions.length)); quizOptions.appendChild(button); });
       quiz.classList.add('show');
